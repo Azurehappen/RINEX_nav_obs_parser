@@ -1,4 +1,5 @@
 function obs = obsstctinit()
+% Initialize obs struct
     obs.GPS = struct;obs.GAL = struct;obs.GLO = struct;obs.BDS = struct;
     obs.GPS(1).type = 'L1 C/A';   obs.GPS(2).type = 'L2';
     obs.GPS(1).data.P = [];       obs.GPS(2).data.P = [];

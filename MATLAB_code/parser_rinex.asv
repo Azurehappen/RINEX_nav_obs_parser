@@ -44,10 +44,9 @@ if flag == 1
         fprintf ('Not RINEX version 3');
     end
 end
-%% Save to MAT file
-% if ~isempty(eph)
-%     save ([fileName,'_nav.mat'], 'eph');
-% end
-% if ~isempty(obs)
-%     save ([fileName,'_obs.mat'], 'obs');
-% end
+%%Save to MAT file
+if ~isempty(eph)
+    save ([fileName,'_nav.mat'], 'eph');
+end
+if ~isempty(obs)
+% save ([fileName,'_nav.mat'], 'eph');
