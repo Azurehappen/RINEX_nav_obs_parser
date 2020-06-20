@@ -17,7 +17,6 @@ fprintf ('Loading ephemeris...\n \n');
 navfile = fopen(navpath);
 %----------------------------------------------------%
 % Initialize variables
-eph.DOcreate=[];
 eph.ionoParameters=[];
 eph.LeapSeconds=[];
 GPS.prn_avb = []; GAL.prn_avb = []; BDS.prn_avb = []; GLO.prn_avb = [];
@@ -156,7 +155,7 @@ while ~feof(navfile)
             GAL.SV_acc(prn,indx) = data(1); % SISA Signal in space accuracy (meters) 
             GAL.SV_health(prn,indx) = data(2); % SV health
             GAL.BGD_E5a(prn,indx) = data(3); % BGD E5a/E1 (seconds) 
-            GAL.BGD_E5B(prn,indx) = data(4); % BGD E5b/E1 (seconds)
+            GAL.BGD_E5b(prn,indx) = data(4); % BGD E5b/E1 (seconds)
                 
             data = sscanf(fgetl(navfile),'%f'); 
             GAL.trans_time(prn,indx) = data(1); % Transmission time of message 
@@ -208,7 +207,7 @@ while ~feof(navfile)
             BDS.a_f2(prn,indx) = data(3); % SV clock drift rate (sec/sec2) 
             
             data = sscanf(fgetl(navfile),'%f');   
-            BDS.IODE(prn,indx) = data(1); % Age of Data, Ephemeris  
+            BDS.AODE(prn,indx) = data(1); % Age of Data, Ephemeris  
             BDS.C_rs(prn,indx) = data(2); % Crs (meters) 
             BDS.Delta_n(prn,indx) = data(3); % Delta n (radians/sec) 
             BDS.M_0(prn,indx) = data(4); % M0 (radians) 
@@ -243,7 +242,7 @@ while ~feof(navfile)
                 
             data = sscanf(fgetl(navfile),'%f'); 
             BDS.trans_time(prn,indx) = data(1); % Transmission time of message 
-            BDS.IDOC(prn,indx) = data(2); % Age of Data Clock 
+            BDS.ADOC(prn,indx) = data(2); % Age of Data Clock 
             c = c +1;       
     end
 end

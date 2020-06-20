@@ -10,7 +10,7 @@ function [gps_week, gps_dow, gps_sow] = date2gpst(date)
 %   sow:    seconds of week
 %   dow:    day of week
 %
-% Author: Wang Hu
+% Author: Azurehappen
 
 % Getting starting time date number
 start_datenum = 723186; % GPS start Date number: datenum([1980,1,6,0,0,0])
