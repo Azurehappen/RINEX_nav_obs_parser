@@ -4,7 +4,7 @@
 % Please email bug reports or suggestions for improvements to: wahu@ece.ucr.edu
 ## Supporting standard RINEX version 3 file: .rnx, .nav, .obs
 ## Supporting GPS, GLONASS, GALILEO, BeiDou.
-
+## Plan to do: computing GLONASS and BeiDou IOD for ephemeris that for IGS SSR correction
 If you download the Multi-GNSS observation data file from IGS which is .crx file, you need using
 crx2rnx tool to uncompress .crx file. This tool is available at https://terras.gsi.go.jp/ja/crx2rnx.html
 
