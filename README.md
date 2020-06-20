@@ -1,8 +1,7 @@
 # RINEX_nav-obs_parser
 
 ## A tool for convertting RINEX version 3 navigation data and observation data to '.mat' data struct
-% Please email bug reports or suggestions for improvements to:
-% wahu@ece.ucr.edu
+% Please email bug reports or suggestions for improvements to: wahu@ece.ucr.edu
 ## Supporting standard RINEX version 3 file: .rnx, .nav, .obs
 ## Supporting GPS, GLONASS, GALILEO, BeiDou.
 
