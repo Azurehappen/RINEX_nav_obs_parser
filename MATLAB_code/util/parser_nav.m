@@ -116,7 +116,7 @@ while ~feof(navfile)
             ecount(1,e)=prn;
             indx = sum(ecount==prn);
             tget = str2double(strsplit(line(5:23)));
-            [~,~,GAL.t_oc{prn}(indx)] = date2gnsst(tget); % Time of broadcast (seconds)
+            [~,~,GAL.t_oc{prn}(indx)] = date2gpst(tget); % Time of broadcast (seconds)
             data = sscanf(line(24:end),'%f');
             GAL.a_f0(prn,indx) = data(1); % SV clock bias (seconds) 
             GAL.a_f1(prn,indx) = data(2); % SV clock drift (sec/sec) 
@@ -168,7 +168,7 @@ while ~feof(navfile)
             indx = sum(rcount==prn);
             tget = datetime(tget)+seconds(18); % GPS has 18 seconds ahead of UTC
             tget = [tget.Year,tget.Month,tget.Day,tget.Hour,tget.Minute,tget.Second];
-            [~,~,GLO.t_oc{prn}(indx)] = date2gnsst(tget); % Represent GLO time by GPS time
+            [~,~,GLO.t_oc{prn}(indx)] = date2gpst(tget); % Represent GLO time by GPS time
             data = sscanf(line(24:end),'%f');
             GLO.nTauN(prn,indx) = data(1); % SV clock bias (sec) (-TauN) 
             GLO.pGammaN(prn,indx) = data(2); % SV relative frequency bias (+GammaN) 
@@ -200,7 +200,7 @@ while ~feof(navfile)
             tget = str2double(strsplit(line(5:23)));
             tget = datetime(tget)+seconds(14); % seconds diff from GPS time to BDS time
             tget = [tget.Year,tget.Month,tget.Day,tget.Hour,tget.Minute,tget.Second];
-            [~,~,BDS.t_oc{prn}(indx)] = date2gnsst(tget); % Represent BDS time by GPS time
+            [~,~,BDS.t_oc{prn}(indx)] = date2gpst(tget); % Represent BDS time by GPS time
             data = sscanf(line(24:end),'%f');
             BDS.a_f0(prn,indx) = data(1); % SV clock bias (seconds) 
             BDS.a_f1(prn,indx) = data(2); % SV clock drift (sec/sec) 
