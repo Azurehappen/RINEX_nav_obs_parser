@@ -108,7 +108,7 @@ while (true)
         break;                                                              % End of header loop
     end
 end
-No_obs = round(seconds(datetime(end_t')-datetime(start_t')))+10;
+No_obs = round(seconds(end_t-start_t))+10;
 % Initialization
 obs = obsstctinit(No_obs);
 %-----------------------------------%
