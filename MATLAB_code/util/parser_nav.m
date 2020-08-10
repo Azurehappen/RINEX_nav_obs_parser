@@ -28,8 +28,8 @@ GPS.t_oc = cell(MAXGPSPRN,1);GLO.t_oc = cell(MAXGLOPRN,1);
 GAL.t_oc = cell(MAXGALPRN,1);BDS.t_oc = cell(MAXBDSPRN,1);
 % read header
 fprintf ('Reading header...\n');
-while (true)
-    ionoParameters  = [];    
+ionoParameters  = []; 
+while (true)    
     line = fgetl(navfile);
     lineSplit = strsplit(line);
     if contains(line,'IONOSPHERIC CORR')
@@ -47,6 +47,7 @@ while (true)
         break;
     end
 end
+eph.ionoParameters =  ionoParameters;
 fprintf ('Finished reading the header\n \n');
 %----------------------------------------------------%
 % read body
