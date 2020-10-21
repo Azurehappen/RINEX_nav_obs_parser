@@ -42,7 +42,7 @@ while (true)
         end
             eph.ionoParameters =  ionoParameters;
     elseif contains (line,'LEAP SECONDS')
-        eph.LeapSeconds = data(1);
+        eph.LeapSeconds = str2double(lineSplit(2));
     elseif contains(line,'END OF HEADER')
         break;
     end

@@ -1,5 +1,5 @@
 function obs = parser_obs(obspath)
-% Parse observation data from rinex file to matlab data file. 
+% Parse observation data from rinex file to matlab data file.
 % Supportting RINEX version 3
 %
 %%%%%-----Reference
@@ -16,16 +16,16 @@ function obs = parser_obs(obspath)
 %           Output obs will include GPS, GAL, GLO and BDS
 %           In this statement, attribute 'sys' denote GPS/GLO/GAL/BDS
 %           obs.sys(i).type : The frequency type and measurement code
-%           obs.sys(i).data : P:psedorange, C: carrier phase, D: doppler, S: signal strength 
+%           obs.sys(i).data : P:psedorange, C: carrier phase, D: doppler, S: signal strength
 %           Default:
-%                   GPS(1)->type/data: (C1C) L1 frequency, C/A code; 
+%                   GPS(1)->type/data: (C1C) L1 frequency, C/A code;
 %                   GPS(2)->type/data: (C2L/C2S/C2X) L2 frequency;
-%                   GPS(3)->type/data: (C1W) L1 frequency, P code; 
+%                   GPS(3)->type/data: (C1W) L1 frequency, P code;
 %                   GPS(4)->type/data: (C2W) l2 frequency, P code;
 %
-%                   GLO(1)->type/data: (C1C) L1 frequency, C/A code; 
+%                   GLO(1)->type/data: (C1C) L1 frequency, C/A code;
 %                   GLO(2)->type/data: (C2C) L2 frequency, C/A code;
-%                   GLO(3)->type/data: (C1P) L1 frequency, P code; 
+%                   GLO(3)->type/data: (C1P) L1 frequency, P code;
 %                   GLO(4)->type/data: (C2P) l2 frequency, P code;
 %
 %                   GAL(1)->type/data: (C1X/C1C) E1 frequency;
@@ -42,8 +42,8 @@ obsfile = fopen(obspath);
 %-----------------------------------%
 % read header
 fprintf ('Reading header...\n');
-while (true)  
-    line = fgetl(obsfile);                                                   %get line    
+while (true)
+    line = fgetl(obsfile);                                                   %get line
     if contains(line,'SYS / # / OBS TYPES')
         constellation = line(1);
         switch(constellation)
@@ -86,7 +86,7 @@ while (true)
                     galtype = [galtype insert];
                     i = length(galtype);
                 end
-        case 'C'
+            case 'C'
                 fprintf('File contains BDS observations \n')
                 num_bdstype  = str2double(line(5:6)); % number of obs type
                 bdstype = strsplit(line(8:58));
@@ -131,8 +131,74 @@ while ~feof(obsfile)
                 idx = 1+gap;
                 for i = 1:length(gpstype)
                     if idx + len <=length(line)
-                    % Avioding short line that don't have other types of data
-                        [obs,idx]=readgps(gpstype{i},prn,count,obs,idx,line);         
+                        % Avioding short line that don't have other types of data
+                        switch(gpstype{i}(1))
+                            case 'C' % Psedorange
+                                if strcmp(gpstype{i},'C1C')
+                                    obs.GPS(1).data.P(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(gpstype{i},'C2L')||strcmp(gpstype{i},'C2S')||strcmp(gpstype{i},'C2X')
+                                    obs.GPS(2).data.P(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(gpstype{i},'C1W')
+                                    obs.GPS(3).data.P(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(gpstype{i},'C2W')
+                                    obs.GPS(4).data.P(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                            case 'L' % Carrier phase
+                                if strcmp(gpstype{i},'L1C')
+                                    obs.GPS(1).data.C(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(gpstype{i},'L2L')||strcmp(gpstype{i},'L2S')||strcmp(gpstype{i},'L2X')
+                                    obs.GPS(2).data.C(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(gpstype{i},'L1W')
+                                    obs.GPS(3).data.C(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(gpstype{i},'L2W')
+                                    obs.GPS(4).data.C(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                            case 'D' % Doppler
+                                if strcmp(gpstype{i},'D1C')
+                                    obs.GPS(1).data.D(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(gpstype{i},'D2L')||strcmp(gpstype{i},'D2S')||strcmp(gpstype{i},'D2X')
+                                    obs.GPS(2).data.D(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(gpstype{i},'D1W')
+                                    obs.GPS(3).data.D(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(gpstype{i},'D2W')
+                                    obs.GPS(4).data.D(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                            case 'S' % Signal strength
+                                if strcmp(gpstype{i},'S1C')
+                                    obs.GPS(1).data.S(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(gpstype{i},'S2L')||strcmp(gpstype{i},'S2S')||strcmp(gpstype{i},'S2X')
+                                    obs.GPS(2).data.S(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(gpstype{i},'S1W')
+                                    obs.GPS(3).data.S(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(gpstype{i},'S2W')
+                                    obs.GPS(4).data.S(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                        end
+                        %[obs,idx]=readgps(gpstype{i},prn,count,obs,idx,line,len);
                         idx = idx + min(gap,length(line)-idx);
                     end
                 end
@@ -141,7 +207,73 @@ while ~feof(obsfile)
                 idx = 1+gap;
                 for i = 1:length(glotype)
                     if idx + len <=length(line)
-                        [obs,idx]=readglo(glotype{i},prn,count,obs,idx,line);
+                        switch(glotype{1}(1))
+                            case 'C' % Psedorange
+                                if strcmp(glotype{i},'C1C')
+                                    obs.GLO(1).data.P(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(glotype{i},'C2C')
+                                    obs.GLO(2).data.P(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(glotype{i},'C1P')
+                                    obs.GLO(3).data.P(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(glotype{i},'C2P')
+                                    obs.GLO(4).data.P(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                            case 'L' % Carrier phase
+                                if strcmp(glotype{i},'L1C')
+                                    obs.GLO(1).data.C(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(glotype{i},'L2C')
+                                    obs.GLO(2).data.C(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(glotype{i},'L1P')
+                                    obs.GLO(3).data.C(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(glotype{i},'L2P')
+                                    obs.GLO(4).data.C(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                            case 'D' % Doppler
+                                if strcmp(glotype{i},'D1C')
+                                    obs.GLO(1).data.D(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(glotype{i},'D2C')
+                                    obs.GLO(2).data.D(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(glotype{i},'D1P')
+                                    obs.GLO(3).data.D(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(glotype{i},'D2P')
+                                    obs.GLO(4).data.D(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                            case 'S' % Signal strength
+                                if strcmp(glotype{i},'S1C')
+                                    obs.GLO(1).data.S(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(glotype{i},'S2C')
+                                    obs.GLO(2).data.S(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(glotype{i},'S1P')
+                                    obs.GLO(3).data.S(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(glotype{i},'S2P')
+                                    obs.GLO(4).data.S(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                        end
+                        %                         [obs,idx]=readglo(glotype{i},prn,count,obs,idx,line,len);
                         idx = idx + min(gap,length(line)-idx);
                     end
                 end
@@ -150,7 +282,49 @@ while ~feof(obsfile)
                 idx = 1+gap;
                 for i = 1:length(galtype)
                     if idx + len <=length(line)
-                        [obs,idx]=readgal(galtype{i},prn,count,obs,idx,line);
+                        switch(galtype{1}(1))
+                            case 'C' % Psedorange
+                                if strcmp(galtype{i},'C1C')||strcmp(galtype{i},'C1X')
+                                    obs.GAL(1).data.P(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(galtype{i},'C7I')||strcmp(galtype{i},'C7Q')||strcmp(galtype{i},'C7X')
+                                    obs.GAL(2).data.P(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                            case 'L' % Carrier phase
+                                if strcmp(galtype{i},'L1C')||strcmp(galtype{i},'L1X')
+                                    obs.GAL(1).data.C(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(galtype{i},'L7I')||strcmp(galtype{i},'L7Q')||strcmp(galtype{i},'L7X')
+                                    obs.GAL(2).data.C(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                            case 'D' % Doppler
+                                if strcmp(galtype{i},'D1C')||strcmp(galtype{i},'D1X')
+                                    obs.GAL(1).data.D(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(galtype{i},'D7I')||strcmp(galtype{i},'D7Q')||strcmp(galtype{i},'D7X')
+                                    obs.GAL(2).data.D(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                            case 'S' % Signal strength
+                                if strcmp(galtype{i},'S1C')||strcmp(galtype{i},'S1X')
+                                    obs.GAL(1).data.S(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(galtype{i},'S7I')||strcmp(galtype{i},'S7Q')||strcmp(galtype{i},'S7X')
+                                    obs.GAL(2).data.S(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                        end
+                        %                         [obs,idx]=readgal(galtype{i},prn,count,obs,idx,line,len);
                         idx = idx + min(gap,length(line)-idx);
                     end
                 end
@@ -159,248 +333,61 @@ while ~feof(obsfile)
                 idx = 1+gap;
                 for i = 1:length(bdstype)
                     if idx + len <=length(line)
-                        [obs,idx]=readbds(bdstype{i},prn,count,obs,idx,line);
+                        switch(bdstype{1}(1))
+                            case 'C' % Psedorange
+                                if strcmp(bdstype{i},'C2I')||strcmp(bdstype{i},'C2Q')||strcmp(bdstype{i},'C2X')
+                                    obs.BDS(1).data.P(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(bdstype{i},'C7I')||strcmp(bdstype{i},'C7Q')||strcmp(bdstype{i},'C7X')
+                                    obs.BDS(2).data.P(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                            case 'L' % Carrier phase
+                                if strcmp(bdstype{i},'L2I')||strcmp(bdstype{i},'L2Q')||strcmp(bdstype{i},'L2X')
+                                    obs.BDS(1).data.C(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(bdstype{i},'L7I')||strcmp(bdstype{i},'L7Q')||strcmp(bdstype{i},'L7X')
+                                    obs.BDS(2).data.C(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                            case 'D' % Doppler
+                                if strcmp(bdstype{i},'D2I')||strcmp(bdstype{i},'D2Q')||strcmp(bdstype{i},'D2X')
+                                    obs.BDS(1).data.D(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(bdstype{i},'D7I')||strcmp(bdstype{i},'D7Q')||strcmp(bdstype{i},'D7X')
+                                    obs.BDS(2).data.D(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                            case 'S' % Signal strength
+                                if strcmp(bdstype{i},'S2I')||strcmp(bdstype{i},'S2Q')||strcmp(bdstype{i},'S2X')
+                                    obs.BDS(1).data.S(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                elseif strcmp(bdstype{i},'S7I')||strcmp(bdstype{i},'S7Q')||strcmp(bdstype{i},'S7X')
+                                    obs.BDS(2).data.S(prn,count)=str2double(line(idx:idx+len));
+                                    idx = idx + len;
+                                else
+                                    idx = idx + len;
+                                end
+                        end
+                        %                         [obs,idx]=readbds(bdstype{i},prn,count,obs,idx,line,len);
                         idx = idx + min(gap,length(line)-idx);
                     end
                 end
         end
-    end 
+    end
 end
-obs = simply(obs,count);
+obs = simplyobs(obs,count);
 fclose(obsfile);
 %%Save to MAT file
 % save ([fileName,'_obs.mat'], 'obs');
 %----------------------------------------------------%
 fprintf ('\nObservables loaded correctly\n \n');
-
-    function [obs,idx]=readgps(data_type,prn,count,obs,idx,line)
-        switch(data_type(1))
-            case 'C' % Psedorange
-                if strcmp(data_type,'C1C')
-                    obs.GPS(1).data.P(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'C2L')||strcmp(data_type,'C2S')||strcmp(data_type,'C2X')
-                    obs.GPS(2).data.P(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'C1W')
-                    obs.GPS(3).data.P(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'C2W')
-                    obs.GPS(4).data.P(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end
-            case 'L' % Carrier phase
-                if strcmp(data_type,'L1C')
-                    obs.GPS(1).data.C(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'L2L')||strcmp(data_type,'L2S')||strcmp(data_type,'L2X')
-                    obs.GPS(2).data.C(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'L1W')
-                    obs.GPS(3).data.C(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'L2W')
-                    obs.GPS(4).data.C(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end            
-            case 'D' % Doppler
-                if strcmp(data_type,'D1C')
-                    obs.GPS(1).data.D(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'D2L')||strcmp(data_type,'D2S')||strcmp(data_type,'D2X')
-                    obs.GPS(2).data.D(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'D1W')
-                    obs.GPS(3).data.D(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'D2W')
-                    obs.GPS(4).data.D(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end            
-            case 'S' % Signal strength
-                if strcmp(data_type,'S1C')
-                    obs.GPS(1).data.S(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'S2L')||strcmp(data_type,'S2S')||strcmp(data_type,'S2X')
-                    obs.GPS(2).data.S(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'S1W')
-                    obs.GPS(3).data.S(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'S2W')
-                    obs.GPS(4).data.S(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end             
-        end
-    end
-
-
-    function [obs,idx]=readglo(data_type,prn,count,obs,idx,line)
-        switch(data_type(1))
-            case 'C' % Psedorange
-                if strcmp(data_type,'C1C')
-                    obs.GLO(1).data.P(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'C2C')
-                    obs.GLO(2).data.P(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'C1P')
-                    obs.GLO(3).data.P(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'C2P')
-                    obs.GLO(4).data.P(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end
-            case 'L' % Carrier phase
-                if strcmp(data_type,'L1C')
-                    obs.GLO(1).data.C(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'L2C')
-                    obs.GLO(2).data.C(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'L1P')
-                    obs.GLO(3).data.C(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'L2P')
-                    obs.GLO(4).data.C(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end            
-            case 'D' % Doppler
-                if strcmp(data_type,'D1C')
-                    obs.GLO(1).data.D(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'D2C')
-                    obs.GLO(2).data.D(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'D1P')
-                    obs.GLO(3).data.D(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'D2P')
-                    obs.GLO(4).data.D(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end            
-            case 'S' % Signal strength
-                if strcmp(data_type,'S1C')
-                    obs.GLO(1).data.S(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'S2C')
-                    obs.GLO(2).data.S(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'S1P')
-                    obs.GLO(3).data.S(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'S2P')
-                    obs.GLO(4).data.S(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end             
-        end
-    end
-
-    function [obs,idx]=readgal(data_type,prn,count,obs,idx,line)
-        switch(data_type(1))
-            case 'C' % Psedorange
-                if strcmp(data_type,'C1C')||strcmp(data_type,'C1X')
-                    obs.GAL(1).data.P(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'C7I')||strcmp(data_type,'C7Q')||strcmp(data_type,'C7X')
-                    obs.GAL(2).data.P(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end
-            case 'L' % Carrier phase
-                if strcmp(data_type,'L1C')||strcmp(data_type,'L1X')
-                    obs.GAL(1).data.C(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'L7I')||strcmp(data_type,'L7Q')||strcmp(data_type,'L7X')
-                    obs.GAL(2).data.C(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end           
-            case 'D' % Doppler
-                if strcmp(data_type,'D1C')||strcmp(data_type,'D1X')
-                    obs.GAL(1).data.D(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'D7I')||strcmp(data_type,'D7Q')||strcmp(data_type,'D7X')
-                    obs.GAL(2).data.D(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end            
-            case 'S' % Signal strength
-                if strcmp(data_type,'S1C')||strcmp(data_type,'S1X')
-                    obs.GAL(1).data.S(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'S7I')||strcmp(data_type,'S7Q')||strcmp(data_type,'S7X')
-                    obs.GAL(2).data.S(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end             
-        end
-    end
-
-    function [obs,idx]=readbds(data_type,prn,count,obs,idx,line)
-        switch(data_type(1))
-            case 'C' % Psedorange
-                if strcmp(data_type,'C2I')||strcmp(data_type,'C2Q')||strcmp(data_type,'C2X')
-                    obs.BDS(1).data.P(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'C7I')||strcmp(data_type,'C7Q')||strcmp(data_type,'C7X')
-                    obs.BDS(2).data.P(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end
-            case 'L' % Carrier phase
-                if strcmp(data_type,'L2I')||strcmp(data_type,'L2Q')||strcmp(data_type,'L2X')
-                    obs.BDS(1).data.C(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'L7I')||strcmp(data_type,'L7Q')||strcmp(data_type,'L7X')
-                    obs.BDS(2).data.C(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end           
-            case 'D' % Doppler
-                if strcmp(data_type,'D2I')||strcmp(data_type,'D2Q')||strcmp(data_type,'D2X')
-                    obs.BDS(1).data.D(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'D7I')||strcmp(data_type,'D7Q')||strcmp(data_type,'D7X')
-                    obs.BDS(2).data.D(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end            
-            case 'S' % Signal strength
-                if strcmp(data_type,'S2I')||strcmp(data_type,'S2Q')||strcmp(data_type,'S2X')
-                    obs.BDS(1).data.S(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                elseif strcmp(data_type,'S7I')||strcmp(data_type,'S7Q')||strcmp(data_type,'S7X')
-                    obs.BDS(2).data.S(prn,count)=str2double(line(idx:idx+len));
-                    idx = idx + len;
-                else
-                    idx = idx + len;
-                end             
-        end
-    end
 
 end
 
